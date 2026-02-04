@@ -4,15 +4,157 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Abizard Musik Studio</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;width:100%;height:100%;
+  background:#0b0b10;color:#fff;
+  font-family:Montserrat;overflow:hidden
+}
+
+.header{
+  height:60px;background:#0e0e16;
+  padding:6px 12px;position:relative
+}
+#studioTitle{font-weight:bold;text-shadow:0 0 4px #0ff}
+#clock{font-family:Orbitron;color:#0ff;font-size:13px}
+
+#statusBar{
+  position:absolute;right:70px;bottom:6px;
+  display:flex;gap:8px;font-size:10px;font-family:Orbitron
+}
+.status{
+  padding:2px 6px;border-radius:6px;
+  background:#111;border:1px solid #333
+}
+.offline{color:#f00}
+.connecting{color:#ff0}
+.online{color:#0f0}
+.live{color:#0ff}
+.off{color:#777}
+.infinity-on{color:#0ff;text-shadow:0 0 6px #0ff}
+.infinity-warn{color:#ff0}
+.infinity-off{color:#f00}
+
+.window-controls{
+  position:absolute;right:12px;top:18px;
+  display:flex;gap:6px
+}
+.window-controls button{
+  width:24px;height:24px;border-radius:50%;
+  border:none;color:#fff;cursor:pointer
+}
+#minBtn{background:#f2c94c}
+#restoreBtn{background:#6fcf97;display:none}
+#fullscreenBtn{background:#eb5757}
+
+.main{
+  height:calc(100vh - 60px);
+  padding:8px;display:flex;
+  flex-direction:column;gap:6px
+}
+
+.toolbar button{
+  background:#181824;border:none;
+  border-radius:6px;padding:4px 8px;
+  color:#fff;cursor:pointer
+}
+
+.stage{
+  flex:1;background:#0a0a12;
+  border-radius:12px;border:1px dashed #ffffff22;
+  position:relative;padding:8px;overflow:hidden
+}
+
+/* PLAYER */
+.player-stage{
+  position:absolute;top:8px;right:8px;
+  background:#181824;border-radius:10px;
+  padding:6px;width:180px;font-size:11px;
+  box-shadow:0 0 8px #0ff;display:none
+}
+.player-controls{
+  display:flex;justify-content:center;gap:4px
+}
+.player-controls button{
+  background:none;border:none;
+  color:#0ff;font-size:14px;cursor:pointer
+}
+#playlistDropdownStage{
+  margin-top:4px;max-height:80px;overflow-y:auto
+}
+#playlistDropdownStage div{
+  cursor:pointer;padding:2px;border-radius:4px
+}
+#playlistDropdownStage div:hover{background:#2a2a3a}
+
+/* CHAT */
+.chat-overlay{
+  position:absolute;bottom:4px;left:4px;
+  width:260px;max-height:90%;
+  display:none;flex-direction:column;
+  gap:4px;font-size:10px;overflow-y:auto
+}
+.chat-message{
+  background:rgba(0,0,0,.6);
+  padding:4px;border-radius:8px;
+  display:flex;gap:4px
+}
+.chat-message img{
+  width:20px;height:20px;border-radius:50%
+}
+.username{color:#ffd700;font-weight:bold}
+
+/* TOP RANK / LIKE */
+.top-panel{
+  position:absolute;bottom:4px;left:270px;
+  width:200px;font-size:11px;
+}
+.top-item{
+  display:flex;align-items:center;gap:4px;margin-bottom:2px;
+  background:rgba(0,0,0,.5);padding:2px 4px;border-radius:6px
+}
+.top-item img{
+  width:20px;height:20px;border-radius:50%;
+}
+.crown{color:#ff0;margin-right:2px;}
+
+/* LOGIN */
+.login-overlay{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:#141414;padding:12px;
+  border-radius:12px;display:none;
+  flex-direction:column;gap:8px;
+  align-items:center;box-shadow:0 0 12px #0ff
+}
+
+/* BUBBLE */
+.bubble{
+  position:absolute;width:36px;height:36px;
+  border-radius:50%;box-shadow:0 0 10px #0ff,0 0 20px #0ff,0 0 30px #0ff;
+  transition: transform 0.1s linear, opacity 0.1s linear;
+}
+.bubble img{width:100%;height:100%;border-radius:100%}
+</style>
 </head>
+
 <body>
 
 <div class="header">
   <div id="studioTitle">🎵 ABIZARD MUSIK STUDIO</div>
   <div id="clock"></div>
+
+  <div id="statusBar">
+    <span id="serverStatus" class="status offline">● SERVER</span>
+    <span id="liveStatus" class="status off">● LIVE</span>
+    <span id="infinityStatus" class="status infinity-off">∞ OFF</span>
+  </div>
+
   <div class="window-controls">
     <button id="minBtn">−</button>
     <button id="restoreBtn">☐</button>
@@ -23,10 +165,11 @@
 <div class="main" id="mainContent">
   <div class="toolbar">
     <button id="btnShowPlayer">▶️ Player Musik</button>
-    <button id="btnSimChat">💬 Simulasi Chat</button>
+    <button id="btnLoginTikTok">🔑 Login TikTok</button>
   </div>
 
   <div class="stage">
+
     <div class="player-stage" id="playerStage">
       <div class="player-controls">
         <button id="prevBtn">⏮</button>
@@ -41,9 +184,210 @@
 
     <div class="chat-overlay" id="chatOverlay"></div>
     <div class="top-panel" id="topPanel"></div>
+
+    <div class="login-overlay" id="loginOverlay">
+      <input id="usernameInput" placeholder="Username TikTok">
+      <button id="loginBtn">LOGIN</button>
+    </div>
+
   </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+/* CLOCK */
+setInterval(()=>clock.textContent=new Date().toLocaleTimeString(),1000)
+
+/* WINDOW */
+minBtn.onclick=()=>{mainContent.style.display='none';restoreBtn.style.display='block'}
+restoreBtn.onclick=()=>{mainContent.style.display='flex';restoreBtn.style.display='none'}
+fullscreenBtn.onclick=()=>!document.fullscreenElement
+  ?document.documentElement.requestFullscreen()
+  :document.exitFullscreen()
+
+/* PLAYER */
+let playlist=[],index=0,playing=false
+btnShowPlayer.onclick=()=>playerStage.style.display='block'
+
+addPlaylistBtn.onclick=()=>{
+  const f=document.createElement('input')
+  f.type='file';f.accept='audio/*'
+  f.onchange=e=>{
+    playlist.push(e.target.files[0])
+    renderPlaylist()
+    loadTrack(playlist.length-1)
+  }
+  f.click()
+}
+function renderPlaylist(){
+  playlistDropdownStage.innerHTML=''
+  playlist.forEach((f,i)=>{
+    const d=document.createElement('div')
+    d.textContent='🎵 '+f.name
+    d.onclick=()=>loadTrack(i)
+    playlistDropdownStage.appendChild(d)
+  })
+}
+function loadTrack(i){
+  index=i
+  audioPlayer.src=URL.createObjectURL(playlist[i])
+  audioPlayer.play()
+  playing=true
+  playPauseBtn.textContent='⏸'
+  currentTrackNameStage.textContent=playlist[i].name
+}
+playPauseBtn.onclick=()=>{
+  if(!playlist.length)return
+  playing?audioPlayer.pause():audioPlayer.play()
+  playing=!playing
+  playPauseBtn.textContent=playing?'⏸':'▶️'
+}
+nextBtn.onclick=()=>playlist.length&&loadTrack((index+1)%playlist.length)
+prevBtn.onclick=()=>playlist.length&&loadTrack((index-1+playlist.length)%playlist.length)
+
+/* ===== TIKTOK + INFINITY + CHAT + BUBBLE ===== */
+let ws,heartbeatTimer,reconnectTimer,currentUsername=null
+let topRankData={like:[],rank:[]} // simulasi 3 teratas
+
+function setInfinity(state){
+  infinityStatus.className='status '+state
+  infinityStatus.textContent=
+    state==='infinity-on'?'∞ ON':
+    state==='infinity-warn'?'∞ RECONNECT':
+    '∞ OFF'
+}
+
+btnLoginTikTok.onclick=()=>loginOverlay.style.display='flex'
+
+loginBtn.onclick=()=>{
+  currentUsername=usernameInput.value.trim()
+  if(!currentUsername)return
+  loginOverlay.style.display='none'
+  chatOverlay.style.display='flex'
+  connectTikTok()
+}
+
+function connectTikTok(){
+  serverStatus.className='status connecting'
+  setInfinity('infinity-warn')
+
+  ws=new WebSocket('ws://localhost:8081')
+
+  ws.onopen=()=>{
+    serverStatus.className='status online'
+    setInfinity('infinity-on')
+    ws.send(JSON.stringify({type:'login',username:currentUsername}))
+    startHeartbeat()
+  }
+
+  ws.onmessage=e=>{
+    const d=JSON.parse(e.data)
+    if(d.type==='status') liveStatus.className='status live'
+    if(d.type==='chat') handleChat(d.user,d.avatar,d.text)
+    if(d.type==='like') updateTopLike(d)
+    if(d.type==='gift') updateTopRank(d)
+  }
+
+  ws.onclose=()=>{
+    serverStatus.className='status offline'
+    liveStatus.className='status off'
+    setInfinity('infinity-off')
+    stopHeartbeat()
+    autoReconnect()
+  }
+}
+
+function startHeartbeat(){
+  stopHeartbeat()
+  heartbeatTimer=setInterval(()=>{
+    if(ws?.readyState===1) ws.send(JSON.stringify({type:'ping'}))
+  },4000)
+}
+function stopHeartbeat(){clearInterval(heartbeatTimer)}
+function autoReconnect(){
+  clearTimeout(reconnectTimer)
+  setInfinity('infinity-warn')
+  reconnectTimer=setTimeout(()=>{
+    if(currentUsername) connectTikTok()
+  },3000)
+}
+
+/* CHAT + NEON BUBBLES */
+function handleChat(u,a,t){
+  chatOverlay.innerHTML+=`
+  <div class="chat-message">
+    <img src="${a||''}">
+    <div>
+      <div class="username">${u}</div>
+      <div>${t}</div>
+    </div>
+  </div>`
+  chatOverlay.scrollTop=chatOverlay.scrollHeight
+
+  // Bubble neon
+  const b=document.createElement('div')
+  b.className='bubble'
+  const size=30+Math.random()*10
+  b.style.width=b.style.height=size+'px'
+  b.style.left=Math.random()*(stage.clientWidth-size)+'px'
+  b.style.bottom='0px'
+  b.style.background='hsl('+Math.random()*360+',100%,60%)'
+  b.innerHTML=`<img src="${a||''}">`
+  stage.appendChild(b)
+
+  let y=0
+  const speed=1+Math.random()*3
+  const interval=setInterval(()=>{
+    y+=speed
+    b.style.bottom=y+'px'
+    b.style.opacity=1-y/250
+    if(y>250){b.remove();clearInterval(interval)}
+  },16)
+}
+
+/* TOP LIKE & TOP RANK */
+function updateTopLike(data){
+  // simpan top 3 like
+  let exists=topRankData.like.find(u=>u.user===data.user)
+  if(exists) exists.count+=data.count
+  else topRankData.like.push({user:data.user,avatar:data.avatar,count:data.count})
+  topRankData.like.sort((a,b)=>b.count-a.count)
+  if(topRankData.like.length>3) topRankData.like.length=3
+  renderTopPanel()
+}
+
+function updateTopRank(data){
+  let exists=topRankData.rank.find(u=>u.user===data.user)
+  if(exists) exists.count+=data.count
+  else topRankData.rank.push({user:data.user,avatar:data.avatar,count:data.count})
+  topRankData.rank.sort((a,b)=>b.count-a.count)
+  if(topRankData.rank.length>3) topRankData.rank.length=3
+  renderTopPanel()
+}
+
+function renderTopPanel(){
+  topPanel.innerHTML=''
+  // RANK
+  topRankData.rank.forEach((u,i)=>{
+    const div=document.createElement('div')
+    div.className='top-item'
+    div.innerHTML=`<span class="crown">${['👑','🥈','🥉'][i]||''}</span><img src="${u.avatar||''}">${u.user} x${u.count}`
+    topPanel.appendChild(div)
+  })
+  // LIKE
+  topRankData.like.forEach((u,i)=>{
+    const div=document.createElement('div')
+    div.className='top-item'
+    div.innerHTML=`<span class="crown">${['❤️','💛','💚'][i]||''}</span><img src="${u.avatar||''}">${u.user} x${u.count}`
+    topPanel.appendChild(div)
+  })
+}
+</script>
+
+<!-- ❄️ TIKFINITY FALLING SNOW -->
+<iframe
+  src="https://tikfinity.zerody.one/widget/fallingsnow?cid=2700854"
+  style="position:fixed;inset:0;width:100%;height:100%;border:none;pointer-events:none;z-index:9998;">
+</iframe>
+
 </body>
 </html>
