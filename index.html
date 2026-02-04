@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abizard Musik Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+  <div id="studioTitle">🎵 ABIZARD MUSIK STUDIO</div>
+  <div id="clock"></div>
+  <div class="window-controls">
+    <button id="minBtn">−</button>
+    <button id="restoreBtn">☐</button>
+    <button id="fullscreenBtn">⛶</button>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="toolbar">
+    <button id="btnShowPlayer">▶️ Player Musik</button>
+    <button id="btnSimChat">💬 Simulasi Chat</button>
+  </div>
+
+  <div class="stage">
+    <div class="player-stage" id="playerStage">
+      <div class="player-controls">
+        <button id="prevBtn">⏮</button>
+        <button id="playPauseBtn">▶️</button>
+        <button id="nextBtn">⏭</button>
+        <button id="addPlaylistBtn">➕</button>
+      </div>
+      <div id="currentTrackNameStage">Belum ada track</div>
+      <div id="playlistDropdownStage"></div>
+      <audio id="audioPlayer"></audio>
+    </div>
+
+    <div class="chat-overlay" id="chatOverlay"></div>
+    <div class="top-panel" id="topPanel"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
